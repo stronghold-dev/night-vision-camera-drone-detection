@@ -4,6 +4,7 @@
 CLAUDE.md
 .vscode/
 uv.lock
+.python-version
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -25,6 +26,7 @@ inference_results/
 
 # Weights (large files)
 weights/*.pt
+*.pt
 
 # Archive
 archive/
