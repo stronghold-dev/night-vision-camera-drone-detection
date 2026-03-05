@@ -14,17 +14,17 @@ from pathlib import Path
 # ── Config ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(".")
 
-DRONE9K_ROOT = BASE_DIR / "datasets" / "drone-9k"
+DRONE9K_ROOT = BASE_DIR / "data" / "drone-9k"
 DRONE9K_SPLITS = ["train", "valid", "test"]
 
-IR_ROOT = BASE_DIR / "datasets" / "ir-meridian-202602-20260217T121654-drone" / "images"
+IR_ROOT = BASE_DIR / "data" / "ir-meridian-202602-20260217T121654-drone" / "images"
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"}
 
-OUT_TRAIN = BASE_DIR / "train-v1.txt"
-OUT_VAL   = BASE_DIR / "val-v1.txt"
-OUT_TEST  = BASE_DIR / "test-v1.txt"
-OUT_YAML  = BASE_DIR / "data-v1.yaml"
+OUT_TRAIN = BASE_DIR / "train.txt"
+OUT_VAL   = BASE_DIR / "val.txt"
+OUT_TEST  = BASE_DIR / "test.txt"
+OUT_YAML  = BASE_DIR / "data.yaml"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
