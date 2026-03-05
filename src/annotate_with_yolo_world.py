@@ -11,8 +11,8 @@ import json
 import os
 from pathlib import Path
 
-from ultralytics import YOLO
-
+from sahi import AutoDetectionModel
+from sahi.predict import get_sliced_prediction
 
 # ── Config ────────────────────────────────────────────────────────────────────
 CONFIDENCE   = 0.10   # Low threshold: catch more drones, delete FP in CVAT
@@ -31,15 +31,12 @@ def build_coco_json(img_dir: Path, results, label: str = "drone") -> dict:
     img_paths = sorted(img_dir.glob("*.jpg")) + sorted(img_dir.glob("*.png"))
 
     for img_id, (img_path, result) in enumerate(zip(img_paths, results), start=1):
-        w, h = result.orig_shape[1], result.orig_shape[0]
-        images.append({
-            "id": img_id,
-            "file_name": img_path.name,
-            "width": w,
-            "height": h,
-        })
-        for box in result.boxes:
-            x1, y1, x2, y2 = box.xyxy[0].tolist()
+        w = result.image_width
+        h = result.image_height
+        images.append({"id": img_id, "file_name": img_path.name, "width": w, "height": h})
+        for pred in result.object_prediction_list:
+            bbox = pred.bbox  # sahi BoundingBox
+            x1, y1, x2, y2 = bbox.minx, bbox.miny, bbox.maxx, bbox.maxy
             bw, bh = x2 - x1, y2 - y1
             annotations.append({
                 "id": ann_id,
@@ -48,7 +45,7 @@ def build_coco_json(img_dir: Path, results, label: str = "drone") -> dict:
                 "bbox": [round(x1, 1), round(y1, 1), round(bw, 1), round(bh, 1)],
                 "area": round(bw * bh, 1),
                 "iscrowd": 0,
-                "score": round(float(box.conf[0]), 4),
+                "score": round(pred.score.value, 4),
             })
             ann_id += 1
 
@@ -60,8 +57,18 @@ def run(frames_root: str, output_root: str):
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
-    model = YOLO(MODEL_NAME)
-    model.set_classes(PROMPT)
+    from ultralytics import YOLO
+    _yolo = YOLO(MODEL_NAME)
+    _yolo.set_classes(PROMPT)
+    _yolo.save("yolo_world_custom.pt")
+    _model_path = "yolo_world_custom.pt"  # use saved model with classes baked in
+
+    model = AutoDetectionModel.from_pretrained(
+        model_type="ultralytics",
+        model_path=_model_path,
+        confidence_threshold=CONFIDENCE,
+        device="cuda:0",
+    )
     print(f"Model: {MODEL_NAME} | Prompt: {PROMPT} | Conf: {CONFIDENCE}")
 
     video_dirs = sorted([d for d in frames_root.iterdir() if d.is_dir()])
@@ -77,17 +84,17 @@ def run(frames_root: str, output_root: str):
             continue
 
         print(f"\nProcessing {vid_dir.name} ({len(img_paths)} frames)...")
-        results = model.predict(
-            source=[str(p) for p in img_paths],
-            conf=CONFIDENCE,
-            iou=IOU,
-            imgsz=IMGSZ,
-            batch=1,
-            half=True,
-            verbose=False,
-            stream=True,   # memory-efficient for large frame sets
-        )
-        results = list(results)  # materialise generator
+        results = []
+        for img_path in img_paths:
+            r = get_sliced_prediction(
+                str(img_path),
+                model,
+                slice_height=640,
+                slice_width=640,
+                overlap_height_ratio=0.2,
+                overlap_width_ratio=0.2,
+            )
+            results.append(r)
 
         coco = build_coco_json(vid_dir, results)
         out_path = output_root / f"coco_{vid_dir.name}.json"
