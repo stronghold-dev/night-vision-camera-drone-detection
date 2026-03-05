@@ -1,0 +1,39 @@
+
+# Environment
+.env
+CLAUDE.md
+.vscode/
+uv.lock
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Experiments and outputs
+experiments/
+runs/
+inference_results/
+
+# Cache
+.cache/
+
+# Weights (large files)
+weights/*.pt
+
+# Archive
+archive/
+
+# Data directories (large files)
+data/
+
+# IDE
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
