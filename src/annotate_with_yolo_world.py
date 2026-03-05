@@ -16,8 +16,6 @@ from sahi.predict import get_sliced_prediction
 
 # ── Config ────────────────────────────────────────────────────────────────────
 CONFIDENCE   = 0.10   # Low threshold: catch more drones, delete FP in CVAT
-IOU          = 0.45
-IMGSZ        = 640   # Larger = better for small objects; reduce if OOM
 PROMPT       = ["drone"]  # Try also ["drone", "UAV", "quadcopter"] if recall is low
 MODEL_NAME   = "yolov8l-world.pt"  # options: yolov8s/m/l/x-world.pt
 # ─────────────────────────────────────────────────────────────────────────────
