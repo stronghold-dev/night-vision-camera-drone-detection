@@ -15,9 +15,9 @@ from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 
 # ── Config ────────────────────────────────────────────────────────────────────
-CONFIDENCE   = 0.10   # Low threshold: catch more drones, delete FP in CVAT
-PROMPT       = ["drone"]  # Try also ["drone", "UAV", "quadcopter"] if recall is low
-MODEL_NAME   = "yolov8l-world.pt"  # options: yolov8s/m/l/x-world.pt
+CONFIDENCE   = 0.05   # Low threshold: catch more drones, delete FP in CVAT
+PROMPT       = ["drone", "UAV", "quadcopter", "flying object"]  # Try also ["drone", "UAV", "quadcopter"] if recall is low
+MODEL_NAME   = "yolov8x-world.pt"  # options: yolov8s/m/l/x-world.pt
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -87,10 +87,11 @@ def run(frames_root: str, output_root: str):
             r = get_sliced_prediction(
                 str(img_path),
                 model,
-                slice_height=640,
-                slice_width=640,
-                overlap_height_ratio=0.2,
-                overlap_width_ratio=0.2,
+                slice_height=512,
+                slice_width=512,
+                overlap_height_ratio=0.4,
+                overlap_width_ratio=0.4,
+                postprocess_match_threshold=0.3,
             )
             results.append(r)
 
