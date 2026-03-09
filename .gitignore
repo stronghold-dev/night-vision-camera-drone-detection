@@ -5,6 +5,7 @@ CLAUDE.md
 .vscode/
 uv.lock
 .python-version
+pyproject.toml
 # Python-generated files
 __pycache__/
 *.py[oc]
