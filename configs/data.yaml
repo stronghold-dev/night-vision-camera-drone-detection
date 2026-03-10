@@ -1,0 +1,6 @@
+names:
+  0: drone
+path: /
+train: /home/jonathan.platkiewicz/night-vision-camera-drone-detection/experiments/train.txt
+val:   /home/jonathan.platkiewicz/night-vision-camera-drone-detection/experiments/val.txt
+test:  /home/jonathan.platkiewicz/night-vision-camera-drone-detection/experiments/test.txt
